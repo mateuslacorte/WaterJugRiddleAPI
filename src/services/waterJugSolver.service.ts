@@ -146,7 +146,7 @@ export class WaterJugSolver {
 
   solution(): (string | number)[][] {
     if (this.allSteps.length === 0) {
-      console.log('Sem solução');
+      return [];
     } else {
       let shortest = this.allSteps[0];
 
