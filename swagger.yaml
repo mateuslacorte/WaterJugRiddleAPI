@@ -1,0 +1,48 @@
+openapi: 3.0.0
+paths:
+  /:
+    post:
+      operationId: AppController_solveRiddle
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SolveRiddleDto'
+      responses:
+        '200':
+          description: ''
+info:
+  title: WaterJugRiddle API
+  description: An API for the WaterJugRiddle problem
+  version: '1.0'
+  contact: {}
+tags:
+  - name: WaterJuggleRiddle
+    description: ''
+servers: []
+components:
+  schemas:
+    SolveRiddleDto:
+      type: object
+      properties:
+        x:
+          type: integer
+          description: The capacity of the first jug
+          minimum: 0
+          example: 100
+        'y':
+          type: integer
+          description: The capacity of the second jug
+          minimum: 0
+          example: 2
+        z:
+          type: integer
+          description: The amount to measure
+          minimum: 1
+          example: 96
+      required:
+        - x
+        - 'y'
+        - z
