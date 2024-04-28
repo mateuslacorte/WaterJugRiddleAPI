@@ -4,54 +4,84 @@ export class WaterJugSolver {
   x: number;
   y: number;
   z: number;
-  allStates: number[][];
   allSteps: (string | number)[][][];
 
   constructor(x: number, y: number, z: number) {
     this.x = x;
     this.y = y;
     this.z = z;
-    this.allStates = [];
     this.allSteps = [];
   }
 
-  fillX(currentState: number[], currentSteps: number[][]) {
+  fillX(
+    currentState: number[],
+    currentSteps: (number | string)[][],
+    allStates: (number | string)[][],
+  ) {
     const newState = currentState.slice();
     newState[0] = this.x;
-    this.search(newState.slice(), [
-      ...currentSteps,
-      [newState[0], newState[1], 'Fill bucket X'],
-    ]);
+    this.search(
+      newState.slice(),
+      currentSteps
+        .slice()
+        .concat([[newState[0], newState[1], 'Fill bucket X']]),
+      allStates.slice(),
+    );
   }
 
-  fillY(currentState: number[], currentSteps: number[][]) {
+  fillY(
+    currentState: number[],
+    currentSteps: (number | string)[][],
+    allStates: (number | string)[][],
+  ) {
     const newState = currentState.slice();
     newState[1] = this.y;
-    this.search(newState.slice(), [
-      ...currentSteps,
-      [newState[0], newState[1], 'Fill bucket Y'],
-    ]);
+    this.search(
+      newState.slice(),
+      currentSteps
+        .slice()
+        .concat([[newState[0], newState[1], 'Fill bucket Y']]),
+      allStates.slice(),
+    );
   }
 
-  emptyX(currentState: number[], currentSteps: number[][]) {
+  emptyX(
+    currentState: number[],
+    currentSteps: (number | string)[][],
+    allStates: (number | string)[][],
+  ) {
     const newState = currentState.slice();
     newState[0] = 0;
-    this.search(newState.slice(), [
-      ...currentSteps,
-      [newState[0], newState[1], 'Empty bucket X'],
-    ]);
+    this.search(
+      newState.slice(),
+      currentSteps
+        .slice()
+        .concat([[newState[0], newState[1], 'Empty bucket X']]),
+      allStates.slice(),
+    );
   }
 
-  emptyY(currentState: number[], currentSteps: number[][]) {
+  emptyY(
+    currentState: number[],
+    currentSteps: (number | string)[][],
+    allStates: (number | string)[][],
+  ) {
     const newState = currentState.slice();
     newState[1] = 0;
-    this.search(newState.slice(), [
-      ...currentSteps,
-      [newState[0], newState[1], 'Empty bucket Y'],
-    ]);
+    this.search(
+      newState.slice(),
+      currentSteps
+        .slice()
+        .concat([[newState[0], newState[1], 'Empty bucket Y']]),
+      allStates.slice(),
+    );
   }
 
-  transferXtoY(currentState: number[], currentSteps: number[][]) {
+  transferXtoY(
+    currentState: number[],
+    currentSteps: (number | string)[][],
+    allStates: (number | string)[][],
+  ) {
     const newState = currentState.slice();
     newState[1] += newState[0];
 
@@ -62,13 +92,20 @@ export class WaterJugSolver {
       newState[0] = 0;
     }
 
-    this.search(newState.slice(), [
-      ...currentSteps,
-      [newState[0], newState[1], 'Transfer from bucket X to Y'],
-    ]);
+    this.search(
+      newState.slice(),
+      currentSteps
+        .slice()
+        .concat([[newState[0], newState[1], 'Transfer from bucket X to Y']]),
+      allStates.slice(),
+    );
   }
 
-  transferYtoX(currentState: number[], currentSteps: number[][]) {
+  transferYtoX(
+    currentState: number[],
+    currentSteps: (number | string)[][],
+    allStates: (number | string)[][],
+  ) {
     const newState = currentState.slice();
     newState[0] += newState[1];
 
@@ -79,18 +116,25 @@ export class WaterJugSolver {
       newState[1] = 0;
     }
 
-    this.search(newState.slice(), [
-      ...currentSteps,
-      [newState[0], newState[1], 'Transfer from bucket Y to X'],
-    ]);
+    this.search(
+      newState.slice(),
+      currentSteps
+        .slice()
+        .concat([[newState[0], newState[1], 'Transfer from bucket Y to X']]),
+      allStates.slice(),
+    );
   }
 
-  solved(currentState: number[], currentSteps: (number | string)[][]): boolean {
-    if (currentState[0] == this.z || currentState[1] == this.z) {
+  solved(
+    currentState: (number | string)[],
+    currentSteps: (number | string)[][],
+    allStates: (number | string)[][],
+  ): boolean {
+    if (currentState[0] === this.z || currentState[1] === this.z) {
       this.allSteps.push(currentSteps);
       return true;
     } else if (
-      this.allStates.some(
+      allStates.some(
         (state) => state[0] === currentState[0] && state[1] === currentState[1],
       )
     ) {
@@ -101,14 +145,15 @@ export class WaterJugSolver {
   }
 
   solution(): (string | number)[][] {
-    if (!this.allSteps.length) {
-      return [];
+    if (this.allSteps.length === 0) {
+      console.log('Sem solução');
     } else {
       let shortest = this.allSteps[0];
 
       for (let i = 1; i < this.allSteps.length; i++) {
-        if (this.allSteps[i].length < shortest.length) {
-          shortest = this.allSteps[i];
+        const path = this.allSteps[i];
+        if (path.length < shortest.length) {
+          shortest = path;
         }
       }
 
@@ -116,17 +161,32 @@ export class WaterJugSolver {
     }
   }
 
-  search(currentState: number[], currentSteps: (number | string)[][]) {
-    if (this.solved(currentState, currentSteps)) return;
+  search(
+    currentState: number[],
+    currentSteps: (number | string)[][],
+    allStates: (number | string)[][],
+  ) {
+    if (
+      this.solved(currentState.slice(), currentSteps.slice(), allStates.slice())
+    )
+      return;
 
-    this.allStates.push(currentState.slice());
+    allStates.push(currentState.slice());
 
-    this.fillX(currentState, currentSteps as number[][]);
-    this.fillY(currentState, currentSteps as number[][]);
-    this.emptyX(currentState, currentSteps as number[][]);
-    this.emptyY(currentState, currentSteps as number[][]);
-    this.transferXtoY(currentState, currentSteps as number[][]);
-    this.transferYtoX(currentState, currentSteps as number[][]);
+    this.fillX(currentState.slice(), currentSteps.slice(), allStates.slice());
+    this.fillY(currentState.slice(), currentSteps.slice(), allStates.slice());
+    this.emptyX(currentState.slice(), currentSteps.slice(), allStates.slice());
+    this.emptyY(currentState.slice(), currentSteps.slice(), allStates.slice());
+    this.transferXtoY(
+      currentState.slice(),
+      currentSteps.slice(),
+      allStates.slice(),
+    );
+    this.transferYtoX(
+      currentState.slice(),
+      currentSteps.slice(),
+      allStates.slice(),
+    );
   }
 
   translate(steps: (number | string)[][]): Steps | Error {
@@ -150,7 +210,7 @@ export class WaterJugSolver {
     currentState: number[] = [0, 0],
     currentSteps: (number | string)[][] = [],
   ) {
-    this.search(currentState, currentSteps as number[][]);
+    this.search(currentState.slice(), currentSteps.slice(), []);
     return this.translate(this.solution());
   }
 }
@@ -162,6 +222,3 @@ export type Steps = {
   action: string;
   status: string;
 }[];
-
-const exemplo = new WaterJugSolver(4, 4, 2);
-console.log(exemplo.solve());
